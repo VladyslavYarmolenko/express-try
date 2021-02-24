@@ -1,6 +1,6 @@
 extends layout
 
 block content
-	each user in users
-		ul
+	ul
+		each user in users
 			li (#{user.id}) #{user.name}, #{user.age} years old
