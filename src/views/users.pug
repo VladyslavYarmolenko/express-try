@@ -1,6 +1,37 @@
 extends layout
 
-block content
-	ul
-		each user in users
-			li (#{user.id}) #{user.name}, #{user.age} years old
+block body:content
+	if users == null || users.length === 0
+		h2 No users found
+
+	else
+		h2 Found #{users.length} users:
+
+		ul
+			each user in users
+				li
+					a(href=`users/${user.id}`)
+						| (#{user.id}) #{user.name}, #{user.age} years old
+
+	h2 Create new user:
+
+	form(action="/v1/users", method="post")
+		p
+			span Name:
+			input#name-input(
+				type="text",
+				name="name"
+				minLength="2"
+			)
+
+		p
+			span Age:
+			input#age-input(
+				type="number",
+				name="age"
+				min="0"
+				max="200"
+			)
+
+		.buttons
+			button(type="submit") Create user
