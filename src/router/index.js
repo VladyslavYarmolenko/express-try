@@ -10,15 +10,9 @@ router.route("/")
 	});
 
 router.route("/user")
-	.get(
-		(req, res, next) => {
-			req.user = findByProp("name", req.query.name);
-			next();
-		},
-		(req, res) => {
-			res.json(req.user);
-		},
-	);
+	.get((req, res) => {
+		res.redirect(308, req.path.replace(/\/user$/, "/users"));
+	});
 
 router.route("/users")
 	.get((req, res) => {
@@ -27,7 +21,7 @@ router.route("/users")
 		res.render("users", { users });
 	});
 
-router.route("/user/:id")
+router.route("/users/:id")
 	.get((req, res) => {
 		const user = findByProp("id", req.params.id);
 
