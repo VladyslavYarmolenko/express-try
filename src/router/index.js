@@ -21,9 +21,13 @@ router.route("/user")
 
 router.route("/user/:id")
 	.get((req, res) => {
-		const user = findByProp("id", req.params.id)
+		const user = findByProp("id", req.params.id);
 
-		res.json(user);
+		res.render("user", {
+			id: user.id,
+			name: user.name,
+			age: user.age,
+		});
 	});
 
 module.exports = router;
