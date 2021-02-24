@@ -1,6 +1,5 @@
 const express = require("express");
-const findByQuery = require("./find-by-query");
-const users = require("./users");
+const findByProp = require("./find-by-prop");
 
 const router = express.Router();
 
@@ -9,14 +8,14 @@ router.get("/", (req, res) => {
 });
 
 router.get("/user", (req, res, next) => {
-	req.user = findByQuery(req.query.name);
+	req.user = findByProp("name", req.query.name);
 	next();
 }, (req, res) => {
 	res.json(req.user);
 });
 
 router.get("/user/:id", (req, res) => {
-	const user = users.find((user) => user.id === req.params.id);
+	const user = findByProp("id", req.params.id)
 
 	res.json(user);
 });
