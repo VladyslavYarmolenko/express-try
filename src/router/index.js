@@ -1,5 +1,6 @@
 const express = require("express");
 const findByProp = require("./find-by-prop");
+const getAllUsers = require("./get-all-users");
 
 const router = express.Router();
 
@@ -18,6 +19,13 @@ router.route("/user")
 			res.json(req.user);
 		},
 	);
+
+router.route("/users")
+	.get((req, res) => {
+		const users = getAllUsers();
+
+		res.render("users", { users });
+	});
 
 router.route("/user/:id")
 	.get((req, res) => {
