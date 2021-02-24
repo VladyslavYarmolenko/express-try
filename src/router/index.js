@@ -11,7 +11,7 @@ router.route("/")
 
 router.route("/user")
 	.get((req, res) => {
-		res.redirect(308, req.path.replace(/\/user$/, "/users"));
+		res.redirect(308, "users");
 	});
 
 router.route("/users")
