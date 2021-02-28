@@ -1,6 +1,8 @@
 const express = require("express");
 const findByProp = require("./find-by-prop");
 const getAllUsers = require("./get-all-users");
+const addNewUser = require("./add-new-user");
+const removeUser = require('./remove-user');
 
 const router = express.Router();
 
@@ -19,40 +21,38 @@ router.route("/users")
 		const users = getAllUsers();
 
 		res.render("users", { users });
+	})
+	.post((req, res) => {
+		
+		const reqData = req.body;
+
+		if (!reqData.name)
+			return res.status(400).send('Name param is missed');
+
+		if (!reqData.age)
+			return res.status(400).send('Age param is missed');
+
+		if (reqData.age <= 0)
+			return res.status(400).send('User age must be positive');	
+		
+		const users = getAllUsers();
+
+		let newUserId = 1;
+
+		if (users.length !== 0) {
+			newUserId = Number(users[users.length-1].id) + 1;
+		}
+
+		const newUserData = {
+			id: String(newUserId),
+			name: reqData.name,
+			age: reqData.age
+		};
+
+		addNewUser(newUserData);
+		
+		res.status(201).send(newUserId);
 	});
-
-router.route("/users")
-.post((req, res) => {
-	
-	const reqData = req.body;
-
-	if (!reqData.name)
-		return res.status(400).send('Name param is missed');
-
-	if (!reqData.age)
-		return res.status(400).send('Age param is missed');
-
-	if (reqData.age <= 0)
-		return res.status(400).send('User age must be positive');	
-	
-	const users = getAllUsers();
-
-	let newUserId = 1;
-
-	if (users.length !== 0) {
-		newUserId = Number(users[users.length-1].id) + 1;
-	}
-
-	const newUserData = {
-		id: String(newUserId),
-		name: reqData.name,
-		age: reqData.age
-	};
-
-	users.push(newUserData);
-	
-	res.status(201).send(newUserId);
-});
 
 router.route("/users/:id")
 	.get((req, res) => {
@@ -63,9 +63,7 @@ router.route("/users/:id")
 			name: user.name,
 			age: user.age,
 		});
-	});
-
-	router.route("/users/:id")
+	})
 	.patch((req, res) => {
 		const editParams = ['name', 'age'];
 		const user = findByProp("id", req.params.id);
@@ -83,36 +81,26 @@ router.route("/users/:id")
 			}
 		});
 
-		const users = getAllUsers();
-		let updatedUser = {};
-
-		for(let i = 0; i < users.length; i++){
-			if(users[i].id === user.id){
-				for(let reqParam in reqData){
-					users[i][reqParam] = reqData[reqParam];
-				}
-				updatedUser = users[i];
-			}
+		for(let reqParam in reqData){
+			user[reqParam] = reqData[reqParam];
 		}
 		
-		return res.status(200).json(updatedUser);
-	});
+		return res.status(200).json(user);
+	})
+	.delete((req, res) => {
+		const reqData = req.body;
+		const user = findByProp("id", req.params.id);
 
+		
+		const users = getAllUsers();
+		let removedUser = {};
 
-	router.route("/users/:id")
-		.delete((req, res) => {
-			const reqData = req.body;
-			const user = findByProp("id", req.params.id);
-
-			
-			const users = getAllUsers();
-			let removedUser = {};
-
-			for(let i = 0; i <users.length; i++){
-				if(users[i].id === user.id){
-					removedUser = users.splice(i , 1)
-				}
+		for(let i = 0; i <users.length; i++){
+			if(users[i].id === user.id){
+				removedUser = removeUser(i);
 			}
-			return res.status(200).json(removedUser);
-		})
+		}
+		return res.status(404).json(removedUser);
+	})
+
 module.exports = router;
